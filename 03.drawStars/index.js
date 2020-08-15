@@ -37,3 +37,12 @@ case6;
 for (let i = 9; i > 0; i -= 2) {
   console.log(' '.repeat(10 - i / 2), '*'.repeat(i), ' '.repeat(10 - i / 2));
 }
+
+case6;
+
+for (let i = 1; i < 5; i += 2) {
+  console.log(' '.repeat(10 - i / 2), '*'.repeat(i), ' '.repeat(10 - i / 2));
+}
+for (let i = 5; i > 0; i -= 2) {
+  console.log(' '.repeat(10 - i / 2), '*'.repeat(i), ' '.repeat(10 - i / 2));
+}
