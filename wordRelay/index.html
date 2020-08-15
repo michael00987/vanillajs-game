@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끝말 잇기</title>
+  </head>
+  <body>
+    <ul id="list">
+      <li class="lastItem">미카엘</li>
+    </ul>
+    <input id="input" placeholder="입력" />
+    <button id="button">제출</button>
+  </body>
+  <script>
+    const list = document.getElementById('list');
+    const input = document.getElementById('input');
+    const button = document.getElementById('button');
+    button.addEventListener('click', () => {
+      console.log(list.lastElementChild.innerHTML);
+      console.log([list.lastElementChild.innerHTML.length - 1]);
+      if (
+        list.lastElementChild.innerHTML[
+          list.lastElementChild.innerHTML.length - 1
+        ] === input.value[0]
+      ) {
+        const newItem = document.createElement('li');
+        newItem.innerHTML = input.value;
+        list.appendChild(newItem);
+        input.value = '';
+        // const li = document.createElement('li');
+      } else {
+        input.value = '';
+      }
+    });
+  </script>
+</html>
