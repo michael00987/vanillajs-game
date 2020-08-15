@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>구구단</title>
+  </head>
+  <body>
+    <div>구구단</div>
+    <span id="first">1</span> x <span id="second">5</span> =
+    <input id="result" />
+    <button id="button" type="number">제출</button>
+    <div id="ok"></div>
+  </body>
+  <script>
+    const first = document.getElementById('first');
+    const second = document.getElementById('second');
+    const result = document.getElementById('result');
+    const button = document.getElementById('button');
+    const ok = document.getElementById('ok');
+
+    first.innerHTML = Math.floor(Math.random() * 10 + 1);
+    second.innerHTML = Math.floor(Math.random() * 10 + 1);
+
+    button.addEventListener('click', () => {
+      console.log(Number(result.value));
+      console.log(
+        Number(first.innerHTML),
+        Number(second.innerHTML),
+        Number(result.value)
+      );
+      if (
+        Number(first.innerHTML) * Number(second.innerHTML) ===
+        Number(result.value)
+      ) {
+        ok.innerHTML = '정답';
+        first.innerHTML = Math.floor(Math.random() * 10 + 1);
+        second.innerHTML = Math.floor(Math.random() * 10 + 1);
+      } else {
+        ok.innerHTML = '오답';
+      }
+    });
+  </script>
+</html>
