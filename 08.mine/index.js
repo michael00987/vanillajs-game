@@ -1,10 +1,11 @@
 const tbody = document.querySelector('#table tbody');
-const data = [];
 document.querySelector('#exec').addEventListener('click', () => {
+  tbody.innerHTML = '';
+  const data = [];
   const ver = document.querySelector('#ver').value;
   const hor = document.querySelector('#hor').value;
   const mine = document.querySelector('#mine').value;
-  console.log(hor * ver);
+  // console.log(hor * ver);
 
   // 지뢰 위치 뽑기
   const candidate = Array(ver * hor)
@@ -20,11 +21,11 @@ document.querySelector('#exec').addEventListener('click', () => {
     )[0];
     shuple.push(shupleItem);
   }
-  console.log(
-    shuple.sort((a, b) => {
-      return a - b;
-    })
-  );
+  // console.log(
+  //   shuple.sort((a, b) => {
+  //     return a - b;
+  //   })
+  // );
   // 지뢰 테이블 만들기
   for (let i = 0; i < parseInt(ver, 10); i++) {
     const tr = document.createElement('tr');
@@ -41,7 +42,7 @@ document.querySelector('#exec').addEventListener('click', () => {
           e.currentTarget
         );
         let row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
-        console.log(parentTr, parentTbody, e.currentTarget, row, cell);
+        // console.log(parentTr, parentTbody, e.currentTarget, row, cell);
         if (
           e.currentTarget.textContent === 'X' ||
           e.currentTarget.textContent === ''
@@ -58,17 +59,48 @@ document.querySelector('#exec').addEventListener('click', () => {
           }
         }
       });
+      td.addEventListener('click', (e) => {
+        let parentTr = e.currentTarget.parentNode;
+        let parentTbody = e.currentTarget.parentNode.parentNode;
+        let cell = Array.prototype.indexOf.call(
+          parentTr.children,
+          e.currentTarget
+        );
+        let row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+        if (data[row][cell] === 'X') {
+          e.currentTarget.textContent = '펑';
+        } else {
+          let around = [data[row][cell - 1], data[row][cell + 1]];
+          if (data[row - 1]) {
+            around = around.concat(
+              data[row - 1][cell - 1],
+              data[row - 1][cell],
+              data[row - 1][cell + 1]
+            );
+          }
+          if (data[row + 1]) {
+            around = around.concat(
+              data[row + 1][cell - 1],
+              data[row + 1][cell],
+              data[row + 1][cell + 1]
+            );
+          }
+          e.currentTarget.textContent = around.filter((v) => {
+            return v === 'X';
+          }).length;
+        }
+      });
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
   }
   // 지뢰 심기
   for (let i = 0; i < shuple.length; i++) {
-    let row = Math.floor(shuple[i] / 10); // 54 => 4
-    let col = shuple[i] % 10;
-    console.log(row, col);
+    let row = Math.floor(shuple[i] / hor); // 54 => 4
+    let col = shuple[i] % ver;
+    // console.log(row, col);
     tbody.children[row].children[col].textContent = 'X';
     data[row][col] = 'X';
   }
-  console.log(data);
+  // console.log(data);
 });
