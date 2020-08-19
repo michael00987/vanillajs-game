@@ -1,7 +1,11 @@
 const tbody = document.querySelector('#table tbody');
+let openedCell = 0;
 document.querySelector('#exec').addEventListener('click', () => {
   tbody.innerHTML = '';
+  document.querySelector('#result').textContent = '';
   const data = [];
+  openedCell = 0;
+
   const ver = document.querySelector('#ver').value;
   const hor = document.querySelector('#hor').value;
   const mine = document.querySelector('#mine').value;
@@ -35,6 +39,12 @@ document.querySelector('#exec').addEventListener('click', () => {
       const td = document.createElement('td');
       td.addEventListener('contextmenu', (e) => {
         e.preventDefault();
+        if (
+          document.querySelector('#result').textContent === '실패' ||
+          document.querySelector('#result').textContent === '성공'
+        ) {
+          return;
+        }
         let parentTr = e.currentTarget.parentNode;
         let parentTbody = e.currentTarget.parentNode.parentNode;
         let cell = Array.prototype.indexOf.call(
@@ -60,6 +70,12 @@ document.querySelector('#exec').addEventListener('click', () => {
         }
       });
       td.addEventListener('click', (e) => {
+        if (
+          document.querySelector('#result').textContent === '실패' ||
+          document.querySelector('#result').textContent === '성공'
+        ) {
+          return;
+        }
         let parentTr = e.currentTarget.parentNode;
         let parentTbody = e.currentTarget.parentNode.parentNode;
         let cell = Array.prototype.indexOf.call(
@@ -68,8 +84,11 @@ document.querySelector('#exec').addEventListener('click', () => {
         );
         let row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
         e.currentTarget.classList.add('opened');
+        openedCell += 1;
+
         if (data[row][cell] === 'X') {
           e.currentTarget.textContent = '펑';
+          document.querySelector('#result').textContent = '실패';
         } else {
           let around = [data[row][cell - 1], data[row][cell + 1]];
           if (data[row - 1]) {
@@ -90,7 +109,7 @@ document.querySelector('#exec').addEventListener('click', () => {
             return v === 'X';
           }).length;
 
-          e.currentTarget.textContent = aroundMine;
+          e.currentTarget.textContent = aroundMine || '';
 
           if (aroundMine === 0) {
             aroundCell = [];
@@ -125,6 +144,9 @@ document.querySelector('#exec').addEventListener('click', () => {
               });
           }
         }
+        if (openedCell === hor * ver - mine) {
+          document.querySelector('#result').textContent = '성공';
+        }
       });
       tr.appendChild(td);
     }
@@ -140,3 +162,5 @@ document.querySelector('#exec').addEventListener('click', () => {
   }
   // console.log(data);
 });
+
+// 재귀코드 효율 개선
