@@ -70,6 +70,8 @@ document.querySelector('#exec').addEventListener('click', () => {
         }
       });
       td.addEventListener('click', (e) => {
+        console.log(data);
+
         if (
           document.querySelector('#result').textContent === '실패' ||
           document.querySelector('#result').textContent === '성공'
@@ -145,8 +147,10 @@ document.querySelector('#exec').addEventListener('click', () => {
           }
         }
         if (openedCell === hor * ver - mine) {
+          console.log(openedCell, hor, ver, mine);
           document.querySelector('#result').textContent = '성공';
         }
+        console.log(data);
       });
       tr.appendChild(td);
     }
@@ -160,7 +164,8 @@ document.querySelector('#exec').addEventListener('click', () => {
     tbody.children[row].children[col].textContent = 'X';
     data[row][col] = 'X';
   }
-  // console.log(data);
 });
 
 // 재귀코드 효율 개선
+// 버그 발견 - 빈칸 1개 남기고 '펑' 했을때 성공을 뜸
+// 성공 하는 갯수에 차이가 있음. 누를 때마다 열리는 갯수 파악 필요. 열린게 또 열리는거 같음
