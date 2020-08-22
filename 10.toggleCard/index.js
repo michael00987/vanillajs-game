@@ -3,10 +3,13 @@ const hor = 3;
 let clickFlag = true
 let clickedCards = [];
 let completeCards=[]
-const candidateColor=['red','red','yellow','yellow','green','green','orange','orange','white','white','pink','pink']
+const colors=['red','red','yellow','yellow','green','green','orange','orange','white','white','pink','pink']
+let candidateColor=colors.slice()
 let color=[]
-for(let i = 0; candidateColor.length > 0; i++ ){
-  color=color.concat(candidateColor.splice(Math.floor(Math.random()*candidateColor.length),1));
+const shuple = ()=>{
+  for(let i = 0; candidateColor.length > 0; i++ ){
+    color=color.concat(candidateColor.splice(Math.floor(Math.random()*candidateColor.length),1));
+  }
 }
 let settingCard = (ver, hor) => {
   for (let i = 0; i < hor * ver; i++) {
@@ -35,7 +38,13 @@ let settingCard = (ver, hor) => {
             clickedCards=[]
             if(completeCards.length===12){
               setTimeout(()=>{
+                document.querySelector('#wrapper').innerHTML=""
                 alert('끝')
+                candidateColor=colors.slice()
+                completeCards=[]
+                color=[]
+                shuple()
+                settingCard(ver,hor)
               },20)
             }
           }else {
@@ -55,7 +64,7 @@ let settingCard = (ver, hor) => {
       
       }
     });
-    document.body.appendChild(card);
+    document.querySelector('#wrapper').appendChild(card);
   }
   document.querySelectorAll('.card').forEach((card,index)=>{
     setTimeout(()=>{
@@ -71,5 +80,5 @@ let settingCard = (ver, hor) => {
   })
 
 };
-
+shuple()
 settingCard(ver, hor);
