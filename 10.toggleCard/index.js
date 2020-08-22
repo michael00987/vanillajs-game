@@ -1,6 +1,8 @@
 const ver = 4;
 const hor = 3;
 let clickFlag = true
+let clickedCards = [];
+let completeCards=[]
 const candidateColor=['red','red','yellow','yellow','green','green','orange','orange','white','white','pink','pink']
 let color=[]
 for(let i = 0; candidateColor.length > 0; i++ ){
@@ -21,8 +23,36 @@ let settingCard = (ver, hor) => {
     cardInner.appendChild(cardBack);
     card.appendChild(cardInner);
     card.addEventListener('click', () => {
-      if(clickFlag){
+      if(clickFlag && !completeCards.includes(card)){
         card.classList.toggle('flipped');
+        clickedCards.push(card)
+        if(clickedCards.length === 2){
+         if( clickedCards[0].querySelector('.card-back').style.backgroundColor===
+          clickedCards[1].querySelector('.card-back').style.backgroundColor){
+            console.log('같다')
+            completeCards.push(clickedCards[0])
+            completeCards.push(clickedCards[1])
+            clickedCards=[]
+            if(completeCards.length===12){
+              setTimeout(()=>{
+                alert('끝')
+              },20)
+            }
+          }else {
+            console.log(clickedCards)
+            clickFlag=false;
+            setTimeout(()=>{
+              console.log(clickedCards[0])
+              clickedCards[0].classList.remove('flipped');
+              clickedCards[1].classList.remove('flipped');
+              clickFlag=true;
+              clickedCards=[]
+            },1000)
+          }
+        }
+      }
+      if(completeCards.length===12){
+      
       }
     });
     document.body.appendChild(card);
