@@ -7,16 +7,26 @@ let myDeckData = []
 let rivalHeroData;
 let myHeroData;
 
+function cardConnectToDom(data, dom, hero){
+    const card = document.querySelector('.card-hidden .card').cloneNode(true)
+    card.querySelector('.card-cost').textContent=data.cost
+    card.querySelector('.card-att').textContent=data.att
+    card.querySelector('.card-hp').textContent=data.hp
+    if(hero){
+    card.querySelector('.card-cost').style.display='none'
+    const name = document.createElement('div')
+    name.textContent="영웅"
+    card.appendChild(name)
+    }
+    dom.appendChild(card)
+}
+
 function generateRivalDeck(num){
     for(let i = 0 ; i< num ; i++){
         rivalDeckData.push(factory())
     }
     rivalDeckData.forEach((data)=>{
-        const card = document.querySelector('.card-hidden .card').cloneNode(true)
-        card.querySelector('.card-cost').textContent=data.cost
-        card.querySelector('.card-att').textContent=data.att
-        card.querySelector('.card-hp').textContent=data.hp
-        rivalDeck.appendChild(card)
+        cardConnectToDom(data, rivalDeck)
     })
 }
 function generateMyDeck(num){
@@ -24,29 +34,24 @@ function generateMyDeck(num){
        myDeckData.push(factory()) 
     }
     myDeckData.forEach((data)=>{
-        const card = document.querySelector('.card-hidden .card').cloneNode(true)
-        card.querySelector('.card-cost').textContent=data.cost
-        card.querySelector('.card-att').textContent=data.att
-        card.querySelector('.card-hp').textContent=data.hp
-        myDeck.appendChild(card)
+        cardConnectToDom(data, myDeck)
+
     })
 }
 function generateRivalHero(){
     rivalHeroData= factory(true)
+    cardConnectToDom(rivalHeroData, rivalHero,true)
 }
 function generateMyHero(){
     myHeroData= factory(true)
+    cardConnectToDom(myHeroData, myHero,true)
 }
-function initialSetting(){
-    generateRivalDeck(5)
-    generateMyDeck(5)
-    generateRivalHero()
-    generateMyHero()
-};
+
 function Card(hero){
     if(hero){
         this.att =Math.ceil( Math.random()*2);
         this.hp =Math.ceil( Math.random()*5)+25;
+        this.hero=true;
     }else{
         this.att =Math.ceil( Math.random()*5);
         this.hp =Math.ceil( Math.random()*5);
@@ -57,5 +62,12 @@ function Card(hero){
 function factory(hero){
     return new Card(hero)
 }
-console.log(myDeckData)
+
+function initialSetting(){
+    generateRivalDeck(5)
+    generateMyDeck(5)
+    generateRivalHero()
+    generateMyHero()
+};
+
 initialSetting();
