@@ -22,8 +22,9 @@ let 무지 = new Card('무지', 1, 2);
 console.log(무지);
 
 console.log('------------------------');
+console.log('다음 에러는 학습을 위해 출력한 에러 입니다. line : 41')
 미카엘 = Card('michael', 5, 10);
-console.log(미카엘);
+console.log("미카엘",미카엘);
 // new 키워드를 붙이지 않으면 함수로 작동하고 Card 함수는 return 값이 없기 때문에 undefined 를 반환한다.
 // 이때 this 는 window 이다
 // new 를 붙이면 this 는 해당 변수가 된다. 여기서는 this는  미카엘, 무지 가 된다. 그래서 미카엘.name, 무지.hp 등을 사용할수 있다.
