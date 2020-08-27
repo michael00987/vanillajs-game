@@ -6,6 +6,7 @@ const rivalField=document.getElementById('rival-cards')
 const myField=document.getElementById('my-cards')
 const rivalCost=document.getElementById('rival-cost')
 const myCost=document.getElementById('my-cost')
+const turnButton=document.getElementById('turn-btn')
 let rivalDeckData = []
 let myDeckData = []
 let rivalHeroData;
@@ -69,7 +70,7 @@ function cardConnectToDom(data, dom, hero){
             rivalFieldData.forEach(data=>{
                 cardConnectToDom(data,rivalField)
             })
-            myDeckData.forEach((data)=>{
+            rivalDeckData.forEach((data)=>{
                 cardConnectToDom(data,rivalDeck)
             })
         }
@@ -130,3 +131,11 @@ function initialSetting(){
 };
 
 initialSetting();
+
+turnButton.addEventListener('click',()=>{
+    tern=!tern
+    document.getElementById('rival').classList.toggle('turn')
+    document.getElementById('my').classList.toggle('turn')
+
+
+})
