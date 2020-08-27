@@ -1,19 +1,48 @@
-const rivalHero=document.getElementById('rival-hero')
-const myHero=document.getElementById('my-hero')
-const rivalDeck=document.getElementById('rival-deck')
-const myDeck=document.getElementById('my-deck')
-const rivalField=document.getElementById('rival-cards')
-const myField=document.getElementById('my-cards')
-const rivalCost=document.getElementById('rival-cost')
-const myCost=document.getElementById('my-cost')
+let rival ={
+    hero:document.getElementById('rival-hero'),
+    deck:document.getElementById('rival-deck'),
+    field:document.getElementById('rival-cards'),
+    cost:document.getElementById('rival-cost'),
+    deckData:[],
+    heroData:[],
+    fieldData:[]
+}
+
+let me ={
+    hero:document.getElementById('my-hero'),
+    deck:document.getElementById('my-deck'),
+    field:document.getElementById('my-cards'),
+    cost:document.getElementById('my-cost'),
+    deckData:[],
+    heroData:[],
+    fieldData:[]
+}
+
 const turnButton=document.getElementById('turn-btn')
-let rivalDeckData = []
-let myDeckData = []
-let rivalHeroData;
-let myHeroData;
-let rivalFieldData=[]
-let myFieldData=[]
 let tern = true;
+
+function deckToField(myTurn,data){
+    let obj = myTurn? me:rival
+    let currCost = Number(obj.cost.textContent)
+    if(currCost<data.cost){
+        return true;
+    }
+    currCost -=data.cost
+    obj.cost.textContent=currCost
+   let idx = obj.deckData.indexOf(data)
+   obj.deckData.splice(idx,1)
+   obj.fieldData.push(data)
+   console.log(obj.deckData,obj.fieldData)
+   obj.deck.innerHTML=""
+   obj.field.innerHTML=""
+   obj.fieldData.forEach(data=>{
+       cardConnectToDom(data,obj.field)
+   })
+   obj.deckData.forEach((data)=>{
+       cardConnectToDom(data,obj.deck)
+   })
+   data.field=true;
+}
 
 function cardConnectToDom(data, dom, hero){
     const card = document.querySelector('.card-hidden .card').cloneNode(true)
@@ -29,50 +58,21 @@ function cardConnectToDom(data, dom, hero){
     card.addEventListener('click',(card)=>{
         console.log(tern, data)
         if(tern){
-            if(!data.mine){
+            if(!data.mine || data.field){
                 return;
             }
-            let currCost = Number(myCost.textContent)
-            if(currCost<data.cost){
-                return;
+           
+            if(!deckToField(true,data)){
+                generateMyDeck(1)
             }
-            currCost -=data.cost
-            myCost.textContent=currCost
-           let idx = myDeckData.indexOf(data)
-           myDeckData.splice(idx,1)
-           myFieldData.push(data)
-           console.log(myDeckData,myFieldData)
-           myDeck.innerHTML=""
-           myField.innerHTML=""
-           myFieldData.forEach(data=>{
-               cardConnectToDom(data,myField)
-           })
-           myDeckData.forEach((data)=>{
-               cardConnectToDom(data,myDeck)
-           })
-
         }else{
-            if(data.mine){
+            if(data.mine  || data.field){
                 return;
             }
-            let currCost = Number(rivalCost.textContent)
-            if(currCost<data.cost){
-                return;
+            if(!deckToField(false,data)){
+                generateRivalDeck(1)
             }
-            currCost -=data.cost
-            rivalCost.textContent=currCost
-            let idx = rivalDeckData.indexOf(data)
-            rivalDeckData.splice(idx,1)
-            rivalFieldData.push(data)
-            console.log(rivalDeckData,rivalFieldData)
-            rivalDeck.innerHTML=""
-            rivalField.innerHTML=""
-            rivalFieldData.forEach(data=>{
-                cardConnectToDom(data,rivalField)
-            })
-            rivalDeckData.forEach((data)=>{
-                cardConnectToDom(data,rivalDeck)
-            })
+
         }
     })
     dom.appendChild(card)
@@ -80,28 +80,29 @@ function cardConnectToDom(data, dom, hero){
 
 function generateRivalDeck(num){
     for(let i = 0 ; i< num ; i++){
-        rivalDeckData.push(factory())
+        rival.deckData.push(factory())
     }
-    rivalDeckData.forEach((data)=>{
-        cardConnectToDom(data, rivalDeck)
+    rival.deck.innerHTML=""
+    rival.deckData.forEach((data)=>{
+        cardConnectToDom(data, rival.deck)
     })
 }
 function generateMyDeck(num){
     for(let i = 0 ; i< num ; i++){
-       myDeckData.push(factory(false, true)) 
+       me.deckData.push(factory(false, true)) 
     }
-    myDeckData.forEach((data)=>{
-        cardConnectToDom(data, myDeck)
-
+    me.deck.innerHTML=""
+    me.deckData.forEach((data)=>{
+        cardConnectToDom(data, me.deck)
     })
 }
 function generateRivalHero(){
-    rivalHeroData= factory(true)
-    cardConnectToDom(rivalHeroData, rivalHero,true)
+    rival.heroData= factory(true)
+    cardConnectToDom(rival.heroData, rival.hero,true)
 }
 function generateMyHero(){
-    myHeroData= factory(true,true)
-    cardConnectToDom(myHeroData, myHero,true)
+    me.heroData= factory(true,true)
+    cardConnectToDom(me.heroData, me.hero,true)
 }
 
 function Card(hero, myCard){
@@ -134,6 +135,11 @@ initialSetting();
 
 turnButton.addEventListener('click',()=>{
     tern=!tern
+    if(tern){
+        me.cost.textContent=10
+    }else{
+        rival.cost.textContent=10
+    }
     document.getElementById('rival').classList.toggle('turn')
     document.getElementById('my').classList.toggle('turn')
 
