@@ -6,6 +6,8 @@ let rival = {
   deckData: [],
   heroData: [],
   fieldData: [],
+  selectedCard: null,
+  selectedCardData: null,
 };
 
 let me = {
@@ -16,10 +18,12 @@ let me = {
   deckData: [],
   heroData: [],
   fieldData: [],
+  selectedCard: null,
+  selectedCardData: null,
 };
 
 const turnButton = document.getElementById('turn-btn');
-let tern = true;
+let turn = true;
 
 function deckToField(myTurn, data) {
   let obj = myTurn ? me : rival;
@@ -44,6 +48,20 @@ function deckToField(myTurn, data) {
   data.field = true;
 }
 
+function redraw(myScreen) {
+  let obj = myScreen ? me : rival;
+  obj.deck.innerHTML = '';
+  obj.field.innerHTML = '';
+  obj.hero.innerHTML = '';
+  obj.fieldData.forEach((data) => {
+    cardConnectToDom(data, obj.field);
+  });
+  obj.deckData.forEach((data) => {
+    cardConnectToDom(data, obj.deck);
+  });
+  cardConnectToDom(obj.heroData, obj.hero, true);
+}
+
 function cardConnectToDom(data, dom, hero) {
   const card = document.querySelector('.card-hidden .card').cloneNode(true);
   card.querySelector('.card-cost').textContent = data.cost;
@@ -55,22 +73,60 @@ function cardConnectToDom(data, dom, hero) {
     name.textContent = '영웅';
     card.appendChild(name);
   }
-  card.addEventListener('click', (card) => {
-    console.log(tern, data);
-    if (tern) {
-      if (!data.mine || data.field) {
+  card.addEventListener('click', () => {
+    console.log(card, data);
+    if (turn) {
+      if (card.classList.contains('card-turnover')) {
         return;
       }
-
-      if (!deckToField(true, data)) {
-        generateMyDeck(1);
+      if (!data.mine && me.selectedCard) {
+        data.hp = data.hp - me.selectedCardData.att;
+        redraw(false);
+        me.selectedCard.classList.remove('card-selected');
+        me.selectedCard.classList.add('card-turnover');
+        me.selectedCard = null;
+        return;
+      } else if (!data.mine) {
+        return;
+      }
+      if (data.field) {
+        card.parentNode.querySelectorAll('.card-selected').forEach((card) => {
+          card.classList.remove('card-selected');
+        });
+        card.classList.add('card-selected');
+        me.selectedCard = card;
+        me.selectedCardData = data;
+        console.log(me.selectedCard, me.selectedCardData);
+      } else {
+        if (!deckToField(true, data)) {
+          generateMyDeck(1);
+        }
       }
     } else {
-      if (data.mine || data.field) {
+      if (card.classList.contains('card-turnover')) {
         return;
       }
-      if (!deckToField(false, data)) {
-        generateRivalDeck(1);
+      if (data.mine && rival.selectedCard) {
+        data.hp = data.hp - rival.selectedCardData.att;
+        redraw(true);
+        rival.selectedCard.classList.remove('card-selected');
+        rival.selectedCard.classList.add('card-turnover');
+        rival.selectedCard = null;
+        return;
+      } else if (data.mine) {
+        return;
+      }
+      if (data.field) {
+        card.parentNode.querySelectorAll('.card-selected').forEach((card) => {
+          card.classList.remove('card-selected');
+        });
+        card.classList.add('card-selected');
+        rival.selectedCard = card;
+        rival.selectedCardData = data;
+      } else {
+        if (!deckToField(false, data)) {
+          generateRivalDeck(1);
+        }
       }
     }
   });
@@ -109,6 +165,7 @@ function Card(hero, myCard) {
     this.att = Math.ceil(Math.random() * 2);
     this.hp = Math.ceil(Math.random() * 5) + 25;
     this.hero = true;
+    this.field = true;
   } else {
     this.att = Math.ceil(Math.random() * 5);
     this.hp = Math.ceil(Math.random() * 5);
@@ -133,12 +190,19 @@ function initialSetting() {
 initialSetting();
 
 turnButton.addEventListener('click', () => {
-  tern = !tern;
-  if (tern) {
+  let obj = turn ? me : rival;
+  document.getElementById('rival').classList.toggle('turn');
+  document.getElementById('my').classList.toggle('turn');
+  obj.field.innerHTML = '';
+  obj.hero.innerHTML = '';
+  obj.fieldData.forEach((data) => {
+    cardConnectToDom(data, obj.field);
+  });
+  cardConnectToDom(obj.heroData, obj.hero, true);
+  turn = !turn;
+  if (turn) {
     me.cost.textContent = 10;
   } else {
     rival.cost.textContent = 10;
   }
-  document.getElementById('rival').classList.toggle('turn');
-  document.getElementById('my').classList.toggle('turn');
 });
