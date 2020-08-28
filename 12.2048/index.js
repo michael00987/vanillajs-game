@@ -47,3 +47,22 @@ function draw() {
 initialize();
 randomGenerate();
 draw();
+
+let startDrag = false;
+let startCoords;
+let endCoords;
+window.addEventListener('mousedown', (e) => {
+  console.log('mousedown', e);
+  startDrag = true;
+  startCoords = [e.clientX, e.clientY];
+});
+window.addEventListener('mousemove', (e) => {
+  if (startDrag) {
+    console.log('mousemove', e);
+  }
+});
+window.addEventListener('mouseup', (e) => {
+  console.log('mouseup', e);
+  startDrag = false;
+  endCoords = [e.clientX, e.clientY];
+});
