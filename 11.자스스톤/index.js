@@ -37,29 +37,74 @@ function deckToField(myTurn, data) {
   obj.deckData.splice(idx, 1);
   obj.fieldData.push(data);
   console.log(obj.deckData, obj.fieldData);
-  obj.deck.innerHTML = '';
-  obj.field.innerHTML = '';
-  obj.fieldData.forEach((data) => {
-    cardConnectToDom(data, obj.field);
-  });
-  obj.deckData.forEach((data) => {
-    cardConnectToDom(data, obj.deck);
-  });
+  redrawField(obj);
+  redrawDeck(obj);
   data.field = true;
 }
 
-function redraw(myScreen) {
-  let obj = myScreen ? me : rival;
-  obj.deck.innerHTML = '';
+function redrawField(obj) {
   obj.field.innerHTML = '';
-  obj.hero.innerHTML = '';
   obj.fieldData.forEach((data) => {
     cardConnectToDom(data, obj.field);
   });
+}
+function redrawDeck(obj) {
+  obj.deck.innerHTML = '';
   obj.deckData.forEach((data) => {
     cardConnectToDom(data, obj.deck);
   });
+}
+function redrawHero(obj) {
+  obj.hero.innerHTML = '';
   cardConnectToDom(obj.heroData, obj.hero, true);
+}
+function redraw(myScreen) {
+  let obj = myScreen ? me : rival;
+  redrawField(obj);
+  redrawDeck(obj);
+  redrawHero(obj);
+}
+
+function turnAction(card, data, m2r) {
+  let friendly = m2r ? me : rival;
+  let enemy = m2r ? rival : me;
+  if (turn) {
+    if (card.classList.contains('card-turnover')) {
+      return;
+    }
+    if ((m2r ? !data.mine : data.mine) && friendly.selectedCard) {
+      data.hp = data.hp - friendly.selectedCardData.att;
+      if (data.hp <= 0) {
+        let index = enemy.fieldData.indexOf(data);
+        if (index > -1) {
+          enemy.fieldData.splice(index, 1);
+        } else {
+          alert('나 승리하셨습니다.');
+          initialSetting();
+        }
+      }
+      redraw(false);
+      friendly.selectedCard.classList.remove('card-selected');
+      friendly.selectedCard.classList.add('card-turnover');
+      friendly.selectedCard = null;
+      return;
+    } else if (m2r ? !data.mine : data.mine) {
+      return;
+    }
+    if (data.field) {
+      card.parentNode.querySelectorAll('.card-selected').forEach((card) => {
+        card.classList.remove('card-selected');
+      });
+      card.classList.add('card-selected');
+      friendly.selectedCard = card;
+      friendly.selectedCardData = data;
+      console.log(friendly.selectedCard, friendly.selectedCardData);
+    } else {
+      if (!deckToField(m2r, data)) {
+        m2r ? generateMyDeck(1) : generateRivalDeck(1);
+      }
+    }
+  }
 }
 
 function cardConnectToDom(data, dom, hero) {
@@ -74,61 +119,7 @@ function cardConnectToDom(data, dom, hero) {
     card.appendChild(name);
   }
   card.addEventListener('click', () => {
-    console.log(card, data);
-    if (turn) {
-      if (card.classList.contains('card-turnover')) {
-        return;
-      }
-      if (!data.mine && me.selectedCard) {
-        data.hp = data.hp - me.selectedCardData.att;
-        redraw(false);
-        me.selectedCard.classList.remove('card-selected');
-        me.selectedCard.classList.add('card-turnover');
-        me.selectedCard = null;
-        return;
-      } else if (!data.mine) {
-        return;
-      }
-      if (data.field) {
-        card.parentNode.querySelectorAll('.card-selected').forEach((card) => {
-          card.classList.remove('card-selected');
-        });
-        card.classList.add('card-selected');
-        me.selectedCard = card;
-        me.selectedCardData = data;
-        console.log(me.selectedCard, me.selectedCardData);
-      } else {
-        if (!deckToField(true, data)) {
-          generateMyDeck(1);
-        }
-      }
-    } else {
-      if (card.classList.contains('card-turnover')) {
-        return;
-      }
-      if (data.mine && rival.selectedCard) {
-        data.hp = data.hp - rival.selectedCardData.att;
-        redraw(true);
-        rival.selectedCard.classList.remove('card-selected');
-        rival.selectedCard.classList.add('card-turnover');
-        rival.selectedCard = null;
-        return;
-      } else if (data.mine) {
-        return;
-      }
-      if (data.field) {
-        card.parentNode.querySelectorAll('.card-selected').forEach((card) => {
-          card.classList.remove('card-selected');
-        });
-        card.classList.add('card-selected');
-        rival.selectedCard = card;
-        rival.selectedCardData = data;
-      } else {
-        if (!deckToField(false, data)) {
-          generateRivalDeck(1);
-        }
-      }
-    }
+    turnAction(card, data, turn);
   });
   dom.appendChild(card);
 }
@@ -137,19 +128,13 @@ function generateRivalDeck(num) {
   for (let i = 0; i < num; i++) {
     rival.deckData.push(factory());
   }
-  rival.deck.innerHTML = '';
-  rival.deckData.forEach((data) => {
-    cardConnectToDom(data, rival.deck);
-  });
+  redrawDeck(rival);
 }
 function generateMyDeck(num) {
   for (let i = 0; i < num; i++) {
     me.deckData.push(factory(false, true));
   }
-  me.deck.innerHTML = '';
-  me.deckData.forEach((data) => {
-    cardConnectToDom(data, me.deck);
-  });
+  redrawDeck(me);
 }
 function generateRivalHero() {
   rival.heroData = factory(true);
@@ -185,6 +170,8 @@ function initialSetting() {
   generateMyDeck(5);
   generateRivalHero();
   generateMyHero();
+  redraw(true);
+  redraw(false);
 }
 
 initialSetting();
@@ -193,12 +180,8 @@ turnButton.addEventListener('click', () => {
   let obj = turn ? me : rival;
   document.getElementById('rival').classList.toggle('turn');
   document.getElementById('my').classList.toggle('turn');
-  obj.field.innerHTML = '';
-  obj.hero.innerHTML = '';
-  obj.fieldData.forEach((data) => {
-    cardConnectToDom(data, obj.field);
-  });
-  cardConnectToDom(obj.heroData, obj.hero, true);
+  redrawField(obj);
+  redrawHero(obj);
   turn = !turn;
   if (turn) {
     me.cost.textContent = 10;
